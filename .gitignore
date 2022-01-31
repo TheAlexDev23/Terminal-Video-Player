@@ -1,0 +1,4 @@
+*.mp4
+
+frames/*.jpg
+resized/*.jpg

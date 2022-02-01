@@ -11,4 +11,4 @@
 
 Example:
 
-./Player.py Rick_Astley_Never_Gonna_Give_You_Up.mp4
+python Player.py Rick_Astley_Never_Gonna_Give_You_Up.mp4

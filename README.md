@@ -1,7 +1,7 @@
 # Terminal-Video-Player
 
 - This code will allow you to play any video in the terminal!
-- Works perefectly with mp4, haven't tested other formats yet
+- Works perefectly with mkv mp4 and mov formats, other are still left to be tested
 - Still work in progress, some features like gray scale are not finished
 
 ## How to run

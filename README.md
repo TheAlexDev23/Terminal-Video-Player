@@ -7,7 +7,7 @@
 ## How to run
 
 - Execute Player.py with 1 argument:
-    - The location of the video you want to play
+    The location of the video you want to play
 
 Example:
 

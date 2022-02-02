@@ -5,7 +5,7 @@ import sys
 import numpy as np
 
 # Ascii values for gray scale
-chars = ["B","S","#","&","@","$","%","*","!",":","."]
+chars = ["B","S","#","&","@","$","%","*","!","."," "]
 
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} [file location] ")
@@ -68,24 +68,23 @@ def resize_images(framesAmount):
     # call resize image for every frame in the video 
     for i in range(framesAmount):
         stdscr.move(y, x)
-        resized_image = resize_image(i, MaxX, y, x)
+        resized_image = resize_image(i, y, x)
         resized_image.save(f"resized/resized{i}.jpg")
     stdscr.addstr("Resized images\n")
     stdscr.refresh()
 
 
 # Resizes 1 image keeping the aspect ratio
-def resize_image(index, Width, y, x):
+def resize_image(index, y, x):
     stdscr.addstr(y, x, f"Resized Image {index}")
     stdscr.refresh()
 
+    Height, Width = stdscr.getmaxyx()
+
     im = Image.open(f"frames/frame{index}.jpg") 
-    np_image = np.array(im) 
-    W, H = im.size;
-    ar = H / W # find ascpect ratio
-    Height = ar * Width 
+
     im = im.convert('L') 
-    im = im.resize((Width, int(Height))) # resize image
+    im = im.resize((Width, Height)) # resize image
     return im
 
 

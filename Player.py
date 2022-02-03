@@ -2,7 +2,6 @@ import curses
 import cv2
 from PIL import Image
 import sys
-import numpy as np
 
 # ASCII values for gray scale
 chars = ["B","S","#","&","@","$","%","*","!","."," "]
@@ -20,9 +19,6 @@ def main():
     frames = get_video_frames()
     stdscr.addstr("Gettting screen size\n")
       
-    MaxY, MaxX  = stdscr.getmaxyx()
-    
-    stdscr.addstr(f"Screen size: [ {MaxX}, {MaxY} ]\n")
     resize_images(frames)
     draw_images(frames) 
 
@@ -111,12 +107,14 @@ def get_video_frames():
 
 # basic default curses configuration
 def start_curses():
+    curses.curs_set(0)
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(True)
 
 # before stoppign curses make the configuration go back to default
 def stop_curses():
+    curses.curs_set(1)
     curses.echo()
     curses.nocbreak()
     stdscr.keypad(False)

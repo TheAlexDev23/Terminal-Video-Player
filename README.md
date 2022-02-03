@@ -14,3 +14,5 @@ python Player.py [Video to play]
 ```bash
 python Player.py ~/Videos/BadApple.mp4
 ```
+
+Video demnostration: [YouTube](https://youtu.be/VCnXks2tUrY)

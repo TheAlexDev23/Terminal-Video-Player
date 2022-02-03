@@ -4,7 +4,7 @@ from PIL import Image
 import sys
 import numpy as np
 
-# Ascii values for gray scale
+# ASCII values for gray scale
 chars = ["B","S","#","&","@","$","%","*","!","."," "]
 
 if len(sys.argv) != 2:
@@ -18,7 +18,7 @@ def main():
     start_curses()
     
     frames = get_video_frames()
-    stdscr.addstr("Gettting screen size\n") 
+    stdscr.addstr("Gettting screen size\n")
       
     MaxY, MaxX  = stdscr.getmaxyx()
     
@@ -45,7 +45,6 @@ def draw_images(imageAmount):
         # move through all pixels in the screen finding their ascii code and printing it out in the needed position 
         for i in range(Y):
             for j in range(X):
-                # some erors appeared becaue out pointer got oud of the screen so i just made this and it worked
                 try:
                     stdscr.move(i, j)
                     # get pixel at coordinate j i 
@@ -59,7 +58,7 @@ def draw_images(imageAmount):
                 #  print out the result 
                 stdscr.refresh()
 
-# Resizes all images by callign reize_image multiple times
+# Resizes all images by calling resize_image multiple times
 def resize_images(framesAmount):
     stdscr.addstr("Started reszing images\n") 
     stdscr.refresh();
@@ -74,7 +73,7 @@ def resize_images(framesAmount):
     stdscr.refresh()
 
 
-# Resizes 1 image keeping the aspect ratio
+# Resizes 1 image
 def resize_image(index, y, x):
     stdscr.addstr(y, x, f"Resized Image {index}")
     stdscr.refresh()
@@ -110,14 +109,13 @@ def get_video_frames():
     stdscr.refresh()
     return count
 
-
+# basic default curses configuration
 def start_curses():
-    # cofnigure cureses
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(True)
 
-
+# before stoppign curses make the configuration go back to default
 def stop_curses():
     curses.echo()
     curses.nocbreak()

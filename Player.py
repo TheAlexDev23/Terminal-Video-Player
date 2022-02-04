@@ -2,9 +2,6 @@ import curses
 import cv2
 from PIL import Image
 import sys
-from YouTubeDownloader import *
-
-YouTube = False
 
 # ASCII values for gray scale
 chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
@@ -12,10 +9,6 @@ chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} [file location] ")
     exit()
-elif len(sys.argv) == 3:
-    if sys.argv[1] == '-y':
-        YouTube = True
-
 else:
     # Initialize curses
     stdscr = curses.initscr()
@@ -98,11 +91,7 @@ def get_video_frames():
     stdscr.addstr("Loading frames\n")
     stdscr.refresh()
 
-    if not YouTube:
-        vidcap = cv2.VideoCapture(sys.argv[1])
-    else:
-        currentDir = GetCurrentWorkingDir()
-        DownloadVideo(sys.argv[2], currentDir)
+    vidcap = cv2.VideoCapture(sys.argv[1])
 
     success, image = vidcap.read()
     count = 0

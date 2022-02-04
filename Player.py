@@ -26,14 +26,17 @@ if len(sys.argv) != 2:
         print(f"Usage: {sys.argv[0]} [file location] ")
         exit()
 
-# Initialize curses
-stdscr = curses.initscr()
+if not YT:
+    # Initialize curses
+    stdscr = curses.initscr()
 
 
 def main():
-    start_curses()
+    if not YT:
+        start_curses()
 
     frames = get_video_frames()
+
     stdscr.addstr("Getting screen size\n")
 
     resize_images(frames)
@@ -84,7 +87,7 @@ def resize_images(framesAmount):
         stdscr.move(y, x)
         resized_image = resize_image(i, y, x)
         resized_image.save(f"resized/resized{i}.jpg")
-    stdscr.addstr("Resized images\n")
+    stdscr.addstr("\nResized images\n")
     stdscr.refresh()
 
 
@@ -104,8 +107,6 @@ def resize_image(index, y, x):
 
 # reads all frames in video and saves them into the frames folder
 def get_video_frames():
-    stdscr.addstr("Loading frames\n")
-    stdscr.refresh()
 
     if not YT:
         vidcap = cv2.VideoCapture(sys.argv[1])
@@ -113,6 +114,12 @@ def get_video_frames():
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([sys.argv[2]])
             vidcap = cv2.VideoCapture("YouTubeTemporary/video.mp4")
+            global stdscr
+            stdscr = curses.initscr()
+            start_curses()
+
+    stdscr.addstr("Loading frames\n")
+    stdscr.refresh()
 
     success, image = vidcap.read()
     count = 0
@@ -136,15 +143,13 @@ def start_curses():
     curses.curs_set(0)
     curses.noecho()
     curses.cbreak()
-    stdscr.keypad(True)
 
 
 # before stopping curses make the configuration go back to default
 def stop_curses():
     curses.curs_set(1)
     curses.echo()
-    curses.nocbreak()
-    stdscr.keypad(False)
+    #curses.nocbreak()
 
 
 if __name__ == "__main__":

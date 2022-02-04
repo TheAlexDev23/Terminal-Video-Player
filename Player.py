@@ -84,7 +84,6 @@ def draw_images(imageAmount):
 def resize_images(framesAmount):
     stdscr.addstr("Started resizing images\n")
     stdscr.refresh()
-    y = stdscr.getmaxyx()[0]
     y, x = stdscr.getyx()
     # call resize image for every frame in the video 
     for i in range(framesAmount):
@@ -162,7 +161,7 @@ def start_curses():
 def stop_curses():
     curses.curs_set(1)
     curses.echo()
-    #curses.nocbreak()
+    curses.nocbreak()
 
 
 if __name__ == "__main__":

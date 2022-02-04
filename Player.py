@@ -5,11 +5,13 @@ from PIL import Image
 import sys
 import youtube_dl
 
+# This would be used by the youtube_dl library to save videos
 ydl_opts = {
     'format': ' bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4',
     'outtmpl': 'YouTubeTemporary/video.%(ext)s',
 }
 
+# If we are trying to download from YouTube this variable would be equal to True and used in other calculations
 YT = False
 
 # ASCII values for gray scale
@@ -17,6 +19,7 @@ chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 
 if len(sys.argv) != 2:
     if len(sys.argv) == 3:
+        # a 'y' as argument indicates that the video should be played from YouTube
         if sys.argv[1] == 'y':
             YT = True
         else:
@@ -26,6 +29,7 @@ if len(sys.argv) != 2:
         print(f"Usage: {sys.argv[0]} [file location] ")
         exit()
 
+# We will only start curses if we are not downloading from YouTube, in case we are this would be started later
 if not YT:
     # Initialize curses
     stdscr = curses.initscr()
@@ -80,7 +84,7 @@ def draw_images(imageAmount):
 def resize_images(framesAmount):
     stdscr.addstr("Started resizing images\n")
     stdscr.refresh()
-    y, MaxX = stdscr.getmaxyx()
+    y = stdscr.getmaxyx()[0]
     y, x = stdscr.getyx()
     # call resize image for every frame in the video 
     for i in range(framesAmount):
@@ -107,13 +111,22 @@ def resize_image(index, y, x):
 
 # reads all frames in video and saves them into the frames folder
 def get_video_frames():
-
+    # Get the video by file name
     if not YT:
         vidcap = cv2.VideoCapture(sys.argv[1])
     else:
+        # Download the video using youtube_dl
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([sys.argv[2]])
             vidcap = cv2.VideoCapture("YouTubeTemporary/video.mp4")
+            # If we marked to download the video from YouTube, we won't have started curses, so here we start it
+
+            """
+            The reason behind why I don't start it right away, is because youtube_dl usually logs some output which with
+            ncurses enabled can have some weird behaviour.
+            This is a solution that worked and I decided to keep it. 
+            """
+
             global stdscr
             stdscr = curses.initscr()
             start_curses()

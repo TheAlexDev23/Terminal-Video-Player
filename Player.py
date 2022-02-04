@@ -1,23 +1,42 @@
+from __future__ import unicode_literals
 import curses
 import cv2
 from PIL import Image
 import sys
+import youtube_dl
+
+ydl_opts = {
+    'format': ' bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4',
+    'outtmpl': 'YouTubeTemporary/video.%(ext)s',
+}
+
+YT = False
 
 # ASCII values for gray scale
 chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 
 if len(sys.argv) != 2:
-    print(f"Usage: {sys.argv[0]} [file location] ")
-    exit()
-else:
+    if len(sys.argv) == 3:
+        if sys.argv[1] == 'y':
+            YT = True
+        else:
+            print(f"Usage: {sys.argv[0]} [file location] ")
+            exit()
+    else:
+        print(f"Usage: {sys.argv[0]} [file location] ")
+        exit()
+
+if not YT:
     # Initialize curses
     stdscr = curses.initscr()
 
 
 def main():
-    start_curses()
+    if not YT:
+        start_curses()
 
     frames = get_video_frames()
+
     stdscr.addstr("Getting screen size\n")
 
     resize_images(frames)
@@ -68,7 +87,7 @@ def resize_images(framesAmount):
         stdscr.move(y, x)
         resized_image = resize_image(i, y, x)
         resized_image.save(f"resized/resized{i}.jpg")
-    stdscr.addstr("Resized images\n")
+    stdscr.addstr("\nResized images\n")
     stdscr.refresh()
 
 
@@ -88,10 +107,19 @@ def resize_image(index, y, x):
 
 # reads all frames in video and saves them into the frames folder
 def get_video_frames():
+
+    if not YT:
+        vidcap = cv2.VideoCapture(sys.argv[1])
+    else:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([sys.argv[2]])
+            vidcap = cv2.VideoCapture("YouTubeTemporary/video.mp4")
+            global stdscr
+            stdscr = curses.initscr()
+            start_curses()
+
     stdscr.addstr("Loading frames\n")
     stdscr.refresh()
-
-    vidcap = cv2.VideoCapture(sys.argv[1])
 
     success, image = vidcap.read()
     count = 0
@@ -115,15 +143,13 @@ def start_curses():
     curses.curs_set(0)
     curses.noecho()
     curses.cbreak()
-    stdscr.keypad(True)
 
 
 # before stopping curses make the configuration go back to default
 def stop_curses():
     curses.curs_set(1)
     curses.echo()
-    curses.nocbreak()
-    stdscr.keypad(False)
+    #curses.nocbreak()
 
 
 if __name__ == "__main__":

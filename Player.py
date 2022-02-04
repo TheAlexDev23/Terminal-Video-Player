@@ -1,17 +1,33 @@
+from __future__ import unicode_literals
 import curses
 import cv2
 from PIL import Image
 import sys
+import youtube_dl
+
+ydl_opts = {
+    'format': ' bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4',
+    'outtmpl': 'YouTubeTemporary/video.%(ext)s',
+}
+
+YT = False
 
 # ASCII values for gray scale
 chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 
 if len(sys.argv) != 2:
-    print(f"Usage: {sys.argv[0]} [file location] ")
-    exit()
-else:
-    # Initialize curses
-    stdscr = curses.initscr()
+    if len(sys.argv) == 3:
+        if sys.argv[1] == 'y':
+            YT = True
+        else:
+            print(f"Usage: {sys.argv[0]} [file location] ")
+            exit()
+    else:
+        print(f"Usage: {sys.argv[0]} [file location] ")
+        exit()
+
+# Initialize curses
+stdscr = curses.initscr()
 
 
 def main():
@@ -91,7 +107,12 @@ def get_video_frames():
     stdscr.addstr("Loading frames\n")
     stdscr.refresh()
 
-    vidcap = cv2.VideoCapture(sys.argv[1])
+    if not YT:
+        vidcap = cv2.VideoCapture(sys.argv[1])
+    else:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([sys.argv[2]])
+            vidcap = cv2.VideoCapture("YouTubeTemporary/video.mp4")
 
     success, image = vidcap.read()
     count = 0

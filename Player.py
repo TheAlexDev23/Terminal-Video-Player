@@ -4,26 +4,28 @@ from PIL import Image
 import sys
 
 # ASCII values for gray scale
-chars = ["B","S","#","&","@","$","%","*","!","."," "]
+chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 
 if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} [file location] ")
     exit()
 else:
     # Initialize curses
-    stdscr = curses.initscr() 
+    stdscr = curses.initscr()
+
 
 def main():
     start_curses()
-    
+
     frames = get_video_frames()
-    stdscr.addstr("Gettting screen size\n")
-      
+    stdscr.addstr("Getting screen size\n")
+
     resize_images(frames)
-    draw_images(frames) 
+    draw_images(frames)
 
     stdscr.getkey()
     stop_curses()
+
 
 # Will draw ascii drawings for each frame in the video
 def draw_images(imageAmount):
@@ -36,8 +38,8 @@ def draw_images(imageAmount):
         Y, X = stdscr.getmaxyx()
 
         # get all the pixels in the image
-        pixels = img.load(); 
-        
+        pixels = img.load();
+
         # move through all pixels in the screen finding their ascii code and printing it out in the needed position 
         for i in range(Y):
             for j in range(X):
@@ -48,18 +50,19 @@ def draw_images(imageAmount):
                     # find the needed ascii character to represent its color
                     character = chars[int(int(pixel) // 25)]
                     stdscr.addstr(character)
-                except: 
+                except:
                     continue
-                
+
                 #  print out the result 
                 stdscr.refresh()
 
+
 # Resizes all images by calling resize_image multiple times
 def resize_images(framesAmount):
-    stdscr.addstr("Started reszing images\n") 
-    stdscr.refresh();
+    stdscr.addstr("Started resizing images\n")
+    stdscr.refresh()
     y, MaxX = stdscr.getmaxyx()
-    y,x = stdscr.getyx() 
+    y, x = stdscr.getyx()
     # call resize image for every frame in the video 
     for i in range(framesAmount):
         stdscr.move(y, x)
@@ -76,10 +79,10 @@ def resize_image(index, y, x):
 
     Height, Width = stdscr.getmaxyx()
 
-    im = Image.open(f"frames/frame{index}.jpg") 
+    im = Image.open(f"frames/frame{index}.jpg")
 
-    im = im.convert('L') 
-    im = im.resize((Width, Height)) # resize image
+    im = im.convert('L')
+    im = im.resize((Width, Height))  # resize image
     return im
 
 
@@ -89,21 +92,22 @@ def get_video_frames():
     stdscr.refresh()
 
     vidcap = cv2.VideoCapture(sys.argv[1])
-    success,image = vidcap.read()
+    success, image = vidcap.read()
     count = 0
     y, x = curses.getsyx()
     while success:
         # output the frames being edited  
-        stdscr.addstr(y,x, f"Frame {count}")
+        stdscr.addstr(y, x, f"Frame {count}")
         stdscr.refresh()
 
-        cv2.imwrite("frames/frame%d.jpg" % count, image)     # save frame as JPEG file      
-        success,image = vidcap.read()
+        cv2.imwrite("frames/frame%d.jpg" % count, image)  # save frame as JPEG file
+        success, image = vidcap.read()
         count += 1
     stdscr.addch("\n")
     stdscr.addstr("Finished loading frames\n")
     stdscr.refresh()
     return count
+
 
 # basic default curses configuration
 def start_curses():
@@ -112,7 +116,8 @@ def start_curses():
     curses.cbreak()
     stdscr.keypad(True)
 
-# before stoppign curses make the configuration go back to default
+
+# before stopping curses make the configuration go back to default
 def stop_curses():
     curses.curs_set(1)
     curses.echo()

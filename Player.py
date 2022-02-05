@@ -3,6 +3,7 @@ import curses
 import cv2
 from PIL import Image
 import sys
+import py_load
 import youtube_dl
 from pytube import extract
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -148,11 +149,20 @@ def resize_images(framesAmount):
     stdscr.addstr("Started resizing images\n")
     stdscr.refresh()
     y, x = stdscr.getyx()
+    
+    # initialize loading bar
+    resize_bar = py_load.LoadingBar(framesAmount)
+    
     # call resize image for every frame in the video 
     for i in range(framesAmount):
         stdscr.move(y, x)
         resized_image = resize_image(i, y, x)
         resized_image.save(f"resized/resized{i}.jpg")
+
+        # Display loading bar
+        resize_bar.progress = i
+        stdscr.addstr(f"\n{resize_bar.display()}\n")
+    stdscr.addstr("Resized images\n")
     stdscr.addstr("\nResized images\n")
     stdscr.refresh()
 

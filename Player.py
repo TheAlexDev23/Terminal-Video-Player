@@ -152,7 +152,7 @@ def resize_images(framesAmount):
     y, x = stdscr.getyx()
     
     # initialize loading bar
-    resize_bar = py_load.LoadingBar(framesAmount)
+    resize_bar = py_load.LoadingBar(Video_Frames, barLength=stdscr.getmaxyx()[1] - 2)
     
     # call resize image for every frame in the video 
     for i in range(framesAmount):
@@ -211,12 +211,17 @@ def get_video_frames():
     Video_FPS = int(vidcap.get(cv2.CAP_PROP_FPS))
     Video_Frames = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+    # initialize loading bar
+    resize_bar = py_load.LoadingBar(Video_Frames, barLength=stdscr.getmaxyx()[1] - 2)
+
     success, image = vidcap.read()
     count = 0
     y, x = curses.getsyx()
     while success:
         # output the frames being edited  
         stdscr.addstr(y, x, f"Frame {count} / {Video_Frames - 1}")
+        resize_bar.progress = count
+        stdscr.addstr(f"\n{resize_bar.display()}\n")
         stdscr.refresh()
 
         cv2.imwrite("frames/frame%d.jpg" % count, image)  # save frame as JPEG file

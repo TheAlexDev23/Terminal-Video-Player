@@ -19,7 +19,7 @@ YT = False
 Captions = False
 CaptionsLang = None
 CaptionsUseLang = False
-
+PreviousCaptionsArrayIndex = 0
 # ASCII values for gray scale
 chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 
@@ -66,8 +66,6 @@ def main():
 
     resize_images(frames)
     draw_images(frames)
-
-    stdscr.getkey()
 
     stdscr.refresh()
     stop_curses()
@@ -119,18 +117,24 @@ def get_captions():
 
 def get_caption_at_frame(frame):
     # Clear first the subtitles line
-    for y in range(stdscr.getmaxyx()[1]-1):
-        stdscr.addstr(stdscr.getmaxyx()[0]-1, y, " ")
+    for y in range(stdscr.getmaxyx()[1] - 1):
+        stdscr.addstr(stdscr.getmaxyx()[0] - 1, y, " ")
 
     time_needed = frame / Video_FPS
     time_passed = CaptionsArray[0]["start"]
-
+    global  PreviousCaptionsArrayIndex
     for i in range(len(CaptionsArray)):
         time_passed += CaptionsArray[i]["duration"]
         if int(time_passed) == int(time_needed):
+            PreviousCaptionsArrayIndex = i
             # Print out the needed caption in the middle of the screen
             stdscr.addstr(stdscr.getmaxyx()[0] - 1, int(stdscr.getmaxyx()[1]/2 - len(CaptionsArray[i]["text"]) / 2),
                           CaptionsArray[i]["text"])
+        else:
+            # Print out the needed caption in the middle of the screen
+            stdscr.addstr(stdscr.getmaxyx()[0] - 1, int(stdscr.getmaxyx()[1] / 2 -
+                                                        len(CaptionsArray[PreviousCaptionsArrayIndex]["text"]) / 2),
+                          CaptionsArray[PreviousCaptionsArrayIndex]["text"])
 
 
 # Resizes all images by calling resize_image multiple times

@@ -118,12 +118,18 @@ def get_captions():
 
 
 def get_caption_at_frame(frame):
+    # Clear first the subtitles line
+    for y in range(stdscr.getmaxyx()[1]-1):
+        stdscr.addstr(stdscr.getmaxyx()[0]-1, y, " ")
+
     time_needed = frame / Video_FPS
     time_passed = CaptionsArray[0]["start"]
+
     for i in range(len(CaptionsArray)):
         time_passed += CaptionsArray[i]["duration"]
         if int(time_passed) == int(time_needed):
-            stdscr.addstr(stdscr.getmaxyx()[0], int(stdscr.getmaxyx()[1]/2 - len(CaptionsArray[i]["text"]) / 2),
+            # Print out the needed caption in the middle of the screen
+            stdscr.addstr(stdscr.getmaxyx()[0] - 1, int(stdscr.getmaxyx()[1]/2 - len(CaptionsArray[i]["text"]) / 2),
                           CaptionsArray[i]["text"])
 
 

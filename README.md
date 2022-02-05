@@ -4,7 +4,7 @@
 - Works perfectly with video formats like mkv mp4 and mov formats, other are still left to be tested
 - Can download any video of YouTube and play it.
 
-#How to run
+# How to run
 
 ### If you want to play a video saved on your computer run the following:
 ```bash

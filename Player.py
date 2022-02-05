@@ -4,6 +4,8 @@ import cv2
 from PIL import Image
 import sys
 import youtube_dl
+from pytube import extract
+from youtube_transcript_api import YouTubeTranscriptApi
 
 # This would be used by the youtube_dl library to save videos
 ydl_opts = {
@@ -13,15 +15,36 @@ ydl_opts = {
 
 # If we are trying to download from YouTube this variable would be equal to True and used in other calculations
 YT = False
-
+# If we want to play our YT vid with captions, then this variable would be equal to true
+Captions = False
+CaptionsLang = None
+CaptionsUseLang = False
+PreviousCaptionsArrayIndex = 0
 # ASCII values for gray scale
 chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 
 if len(sys.argv) != 2:
-    if len(sys.argv) == 3:
-        # a 'y' as argument indicates that the video should be played from YouTube
-        if sys.argv[1] == 'y':
+    """
+    If there's more than 2 arguments the following things might have happened:
+    - We added -y to play a youtube video -> length of argv = 3
+    - The previous but with a -c to play with default subtitles -> length of argv = 4
+    - The previous but after -c the language of the subtitles -> length of argv = 5
+    """
+    if len(sys.argv) == 3 or len(sys.argv) == 4 or len(sys.argv) == 5:
+        # a '-y' as argument indicates that the video should be played from YouTube
+        if sys.argv[1] == '-y':
             YT = True
+            # if after the -y [video link] there's a -c then we would enable captions
+            if len(sys.argv) == 4 and sys.argv[3] == '-c':
+                Captions = True
+                CaptionsLang = None
+                CaptionsUseLang = False
+            # But if the same case as before but there's 5 arguments, the last would be used to specify the captions
+            # language
+            elif len(sys.argv) == 5 and sys.argv[3] == '-c':
+                Captions = True
+                CaptionsLang = sys.argv[4]
+                CaptionsUseLang = True
         else:
             print(f"Usage: {sys.argv[0]} [file location] ")
             exit()
@@ -40,13 +63,17 @@ def main():
         start_curses()
 
     frames = get_video_frames()
-
-    stdscr.addstr("Getting screen size\n")
+    if Captions:
+        stdscr.addstr("Getting video captions")
+        stdscr.refresh()
+        get_captions()
+        stdscr.addstr("Gotten captions")
+        stdscr.refresh()
 
     resize_images(frames)
     draw_images(frames)
 
-    stdscr.getkey()
+    stdscr.refresh()
     stop_curses()
 
 
@@ -66,6 +93,8 @@ def draw_images(imageAmount):
         # move through all pixels in the screen finding their ascii code and printing it out in the needed position 
         for i in range(Y):
             for j in range(X):
+                if i == stdscr.getmaxyx()[0] - 1:
+                    continue
                 try:
                     stdscr.move(i, j)
                     # get pixel at coordinate j i 
@@ -75,9 +104,43 @@ def draw_images(imageAmount):
                     stdscr.addstr(character)
                 except:
                     continue
-
                 #  print out the result 
                 stdscr.refresh()
+        get_caption_at_frame(x)
+        stdscr.refresh()
+
+
+# Return captions if we are playing something from YouTube
+def get_captions():
+    # this is needed because multiple types of url might be used
+    video_code = extract.video_id(sys.argv[2])
+    global CaptionsArray
+    if not CaptionsUseLang:
+        CaptionsArray = YouTubeTranscriptApi.get_transcript(video_code)
+    else:
+        CaptionsArray = YouTubeTranscriptApi.get_transcript(video_code, languages=[CaptionsLang])
+
+
+def get_caption_at_frame(frame):
+    # Clear first the subtitles line
+    for y in range(stdscr.getmaxyx()[1] - 1):
+        stdscr.addstr(stdscr.getmaxyx()[0] - 1, y, " ")
+
+    time_needed = frame / Video_FPS
+    time_passed = CaptionsArray[0]["start"]
+    global  PreviousCaptionsArrayIndex
+    for i in range(len(CaptionsArray)):
+        time_passed += CaptionsArray[i]["duration"]
+        if int(time_passed) == int(time_needed):
+            PreviousCaptionsArrayIndex = i
+            # Print out the needed caption in the middle of the screen
+            stdscr.addstr(stdscr.getmaxyx()[0] - 1, int(stdscr.getmaxyx()[1]/2 - len(CaptionsArray[i]["text"]) / 2),
+                          CaptionsArray[i]["text"])
+        else:
+            # Print out the needed caption in the middle of the screen
+            stdscr.addstr(stdscr.getmaxyx()[0] - 1, int(stdscr.getmaxyx()[1] / 2 -
+                                                        len(CaptionsArray[PreviousCaptionsArrayIndex]["text"]) / 2),
+                          CaptionsArray[PreviousCaptionsArrayIndex]["text"])
 
 
 # Resizes all images by calling resize_image multiple times
@@ -122,7 +185,7 @@ def get_video_frames():
 
             """
             The reason behind why I don't start it right away, is because youtube_dl usually logs some output which with
-            ncurses enabled can have some weird behaviour.
+            curses enabled can have some weird behaviour.
             This is a solution that worked and I decided to keep it. 
             """
 
@@ -133,12 +196,17 @@ def get_video_frames():
     stdscr.addstr("Loading frames\n")
     stdscr.refresh()
 
+    global Video_FPS
+    global Video_Frames
+    Video_FPS = int(vidcap.get(cv2.CAP_PROP_FPS))
+    Video_Frames = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+
     success, image = vidcap.read()
     count = 0
     y, x = curses.getsyx()
     while success:
         # output the frames being edited  
-        stdscr.addstr(y, x, f"Frame {count}")
+        stdscr.addstr(y, x, f"Frame {count} / {Video_Frames - 1}")
         stdscr.refresh()
 
         cv2.imwrite("frames/frame%d.jpg" % count, image)  # save frame as JPEG file

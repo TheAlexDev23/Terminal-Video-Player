@@ -107,7 +107,8 @@ def draw_images(imageAmount):
                     continue
                 #  print out the result 
                 stdscr.refresh()
-        get_caption_at_frame(x)
+        if Captions:
+            get_caption_at_frame(x)
         stdscr.refresh()
 
 

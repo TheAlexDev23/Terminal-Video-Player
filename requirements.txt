@@ -1,0 +1,5 @@
+Pillow
+opencv-python
+youtube_dl
+pytube
+youtube_transcript_api

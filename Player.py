@@ -65,10 +65,10 @@ def main():
 
     frames = get_video_frames()
     if Captions:
-        stdscr.addstr("Getting video captions")
+        stdscr.addstr("Getting video captions\n")
         stdscr.refresh()
         get_captions()
-        stdscr.addstr("Gotten captions")
+        stdscr.addstr("Gotten captions\n")
         stdscr.refresh()
 
     resize_images(frames)

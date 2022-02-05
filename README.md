@@ -65,9 +65,3 @@ python ./Player.py -y "https://www.youtube.com/watch?v=dQw4w9WgXcQ" -c en
 - If you already played a video from YouTube and you want to play another one, you need to first delete the video.mp4 from the YouTubeTemporary folder (note, that this is not necessary if you would be playing the same video or a video from your computer)
 - If subtitles are not found (maybe because there's no subtitles in the video or not in the specified language), an exception would be thrown
 - If the video is not found (maybe because it doesn't exist or there's no internet connection) an exception would also be thrown
-- Running the program requires the following dependencies:
-  - Pillow
-  - OpenCV-python
-  - youtube_dl
-  - pytube
-  - youtube_transcript_api

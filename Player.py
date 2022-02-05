@@ -24,8 +24,14 @@ PreviousCaptionsArrayIndex = 0
 chars = ["B", "S", "#", "&", "@", "$", "%", "*", "!", ".", " "]
 
 if len(sys.argv) != 2:
+    """
+    If there's more than 2 arguments the following things might have happened:
+    - We added -y to play a youtube video -> length of argv = 3
+    - The previous but with a -c to play with default subtitles -> length of argv = 4
+    - The previous but after -c the language of the subtitles -> length of argv = 5
+    """
     if len(sys.argv) == 3 or len(sys.argv) == 4 or len(sys.argv) == 5:
-        # a 'y' as argument indicates that the video should be played from YouTube
+        # a '-y' as argument indicates that the video should be played from YouTube
         if sys.argv[1] == '-y':
             YT = True
             # if after the -y [video link] there's a -c then we would enable captions

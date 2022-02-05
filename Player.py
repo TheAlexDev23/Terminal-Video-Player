@@ -163,7 +163,6 @@ def resize_images(framesAmount):
         # Display loading bar
         resize_bar.progress = i
         stdscr.addstr(f"\n{resize_bar.display()}\n")
-    stdscr.addstr("Resized images\n")
     stdscr.addstr("\nResized images\n")
     stdscr.refresh()
 
@@ -192,8 +191,8 @@ def get_video_frames():
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([sys.argv[2]])
             vidcap = cv2.VideoCapture("YouTubeTemporary/video.mp4")
-            # If we marked to download the video from YouTube, we won't have started curses, so here we start it
 
+            # If we marked to download the video from YouTube, we won't have started curses, so here we start it
             """
             The reason behind why I don't start it right away, is because youtube_dl usually logs some output which with
             curses enabled can have some weird behaviour.

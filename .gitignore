@@ -3,3 +3,4 @@ Videos/*
 .idea
 frames/*.jpg
 resized/*.jpg
+__pycache__
